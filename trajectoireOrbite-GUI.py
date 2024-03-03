@@ -67,34 +67,87 @@ def drawAxis():
     for y in range(NB_DIVISION*8):
         draw.line([PointToPixel(-0.0125, Y_MIN + y* LENGTH_DIVISION_Y/8), PointToPixel(0.0125, Y_MIN + y*LENGTH_DIVISION_Y/8)], fill = (0,0,0), width = 1)
 
-## Récuperation de la valeur de la partie réelle et la partie imaginaire
+## Get the real and imaginary parts of Z
 def print_selectionReal(val):
     global zRealDep
-    sRealValLabel.config(text = str(val))
+    sReal_var.set(str(val))
     zRealDep = float(val)
+
+def mod_selectionReal(event):
+    try:
+        sReal.set(float(sReal_var.get()))
+    except:
+        sReal.set(float(0))
 
 def print_selectionImag(val):
     global zImDep
-    sImagValLabel.config(text = str(val))
+    sImag_var.set(str(val))
     zImDep = float(val)
 
+def mod_selectionImag(event):
+    try:
+        sImag.set(float(sImag_var.get()))
+    except:
+        sImag.set(float(0))
+
+## Get the real and imaginary parts of C
 def print_selectionRealC(val):
     global cx
-    sRealValLabelC.config(text = str(val))
+    sRealC_var.set(str(val))
     cx = float(val)
+
+def mod_selectionRealC(event):
+    try:
+        sRealC.set(float(sRealC_var.get()))
+    except:
+        sRealC.set(float(0))
 
 def print_selectionImagC(val):
     global cy
-    sImagValLabelC.config(text=str(val))
+    sImagC_var.set(str(val))
     cy = float(val)
+
+def mod_selectionImagC(event):
+    try:
+        sImagC.set(float(sImagC_var.get()))
+    except:
+        sImagC.set(float(0))
 
 ### Fonction pour générer l'orbite
 def creer_image():
     global orbiteImage
     global orbiteImageCanvas
+    global zRealDep, zImDep, cx, cy
     orbiteImage = Image.new('RGB', (WIDTH, HEIGHT), "white")
     draw = ImageDraw.Draw(orbiteImage)
     drawAxis()
+
+    ## Use mod_selection functions to make sure we use the right numbers
+    try:
+        sRealC.set(float(sRealC_var.get()))
+    except:
+        sRealC.set(float(0))
+
+    try:
+        sImag.set(float(sImag_var.get()))
+    except:
+        sImag.set(float(0))
+
+    try:
+        sRealC.set(float(sRealC_var.get()))
+    except:
+        sRealC.set(float(0))
+
+    try:
+        sImagC.set(float(sImagC_var.get()))
+    except:
+        sImagC.set(float(0))
+
+    ## Initializing the values for z and c 
+    zRealDep = sReal.get()
+    zImDep = sImag.get()
+    cx = sRealC.get() 
+    cy = sImagC.get()
 
     nbIterationRetrieved = numberIter
 
@@ -125,9 +178,12 @@ def creer_image():
     zIm = zImDep
     iteration = 0
 
+    print('Initialization')
+    print(str(zReal) + ', ' + str(zIm))
+
     # Normal orbit
     while(iteration <= numberIter):
-        print("I'm here")
+        #print("I'm here")
         previousReal = zReal
         previousIm = zIm
         zReal= fctQuatratiqueReal(previousReal, previousIm, cx, cy)
@@ -183,9 +239,9 @@ def creer_image():
         else:
             break
 
-    print('Cesaro Orbit')
-    print('Number of Iterations : ' + str(iteration))
-    print(str(cesaroMeansReal) + ", " + str(cesaroMeansImag))
+    #print('Cesaro Orbit')
+    #print('Number of Iterations : ' + str(iteration))
+    #print(str(cesaroMeansReal) + ", " + str(cesaroMeansImag))
 
     orbiteImage = orbiteImage.rotate(180)
     orbiteImage = orbiteImage.transpose(Image.FLIP_LEFT_RIGHT)
@@ -219,25 +275,37 @@ canvas.create_image(300,240, image=orbiteImageCanvas)
 
 # Sliders to choose the real and imaginary parts of the initial z complex number
 sReal = tk.Scale(window, label='Z real part : ', from_=X_MIN, to=X_MAX, orient=tk.HORIZONTAL, length=200, showvalue=0, tickinterval=2, resolution=RESOL, command=print_selectionReal)
-sReal.place(x = 75, y = Size_Image_HEIGHT + 25)
-sRealValLabel = tk.Label(window, width=7)
-sRealValLabel.place(x = 215, y = Size_Image_HEIGHT + 27)
+sReal.place(x = 75, y = Size_Image_HEIGHT + 28)
+sReal_var = tk.StringVar()
+sRealValLabel = tk.Entry(window, textvariable=sReal_var, width=7)
+sRealValLabel.place(x = 216, y = Size_Image_HEIGHT + 27)
+sReal_var.set("0.0000")
+sRealValLabel.bind("<Return>", mod_selectionReal)
 
 sImag = tk.Scale(window, label='Z imaginary part: ', from_=Y_MIN, to=Y_MAX, orient=tk.HORIZONTAL, length=225, showvalue=0, tickinterval=2, resolution=RESOL, command=print_selectionImag)
-sImag.place(x = 300, y = Size_Image_HEIGHT + 25)
-sImagValLabel = tk.Label(window, width = 7)
-sImagValLabel.place(x= 460, y= Size_Image_HEIGHT + 27)
+sImag.place(x = 300, y = Size_Image_HEIGHT + 28)
+sImag_var = tk.StringVar()
+sImagValLabel = tk.Entry(window, textvariable=sImag_var, width=7)
+sImag_var.set("0.0000")
+sImagValLabel.place(x= 466, y= Size_Image_HEIGHT + 27)
+sImagValLabel.bind("<Return>", mod_selectionImag)
 
 # Sliders to choose the real and imaginary parts of the initial c complex number
 sRealC = tk.Scale(window, label='C real part : ', from_=X_MIN, to=X_MAX, orient=tk.HORIZONTAL, length=200, showvalue=0, tickinterval=2, resolution=RESOL, command=print_selectionRealC)
-sRealC.place(x = 75, y = Size_Image_HEIGHT + 83)
-sRealValLabelC = tk.Label(window, width=7)
-sRealValLabelC.place(x = 215, y = Size_Image_HEIGHT + 85)
+sRealC.place(x = 75, y = Size_Image_HEIGHT + 86)
+sRealC_var = tk.StringVar()
+sRealValLabelC = tk.Entry(window, textvariable = sRealC_var, width=7)
+sRealC_var.set("0.0000")
+sRealValLabelC.place(x = 216, y = Size_Image_HEIGHT + 85)
+sRealValLabelC.bind("<Return>", mod_selectionRealC)
 
 sImagC = tk.Scale(window, label='C imaginary part: ', from_=Y_MIN, to=Y_MAX, orient=tk.HORIZONTAL, length=225, showvalue=0, tickinterval=2, resolution=RESOL, command=print_selectionImagC)
-sImagC.place(x = 300, y = Size_Image_HEIGHT + 83)
-sImagValLabelC = tk.Label(window, width = 7)
-sImagValLabelC.place(x= 460, y= Size_Image_HEIGHT + 85)
+sImagC.place(x = 300, y = Size_Image_HEIGHT + 86)
+sImagC_var = tk.StringVar() 
+sImagValLabelC = tk.Entry(window, textvariable=sImagC_var, width=7)
+sImagC_var.set("0.0000")
+sImagValLabelC.place(x= 466, y= Size_Image_HEIGHT + 85)
+sImagValLabelC.bind("<Return>", mod_selectionImagC)
 
 # Add button to Generate
 generate_Text = tk.StringVar()
@@ -259,5 +327,5 @@ menu.add_cascade(label="File", menu=fileMenu)
 fileMenu.add_command(label="Save image", command = save_Img)
 fileMenu.add_command(label = "View image", command = show_Img)
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     window.mainloop()
