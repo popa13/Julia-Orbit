@@ -259,4 +259,5 @@ menu.add_cascade(label="File", menu=fileMenu)
 fileMenu.add_command(label="Save image", command = save_Img)
 fileMenu.add_command(label = "View image", command = show_Img)
 
-window.mainloop()
+if __name__ = "__main__":
+    window.mainloop()
